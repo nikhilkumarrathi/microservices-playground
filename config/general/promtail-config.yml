@@ -1,0 +1,34 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://dockerhost:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: consumerapp
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: java_consumer
+      __path__: /tmp/logs/consumer.log
+
+- job_name: producerapp
+  static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: java_producer
+        __path__: /tmp/logs/producer.log
+
+- job_name: analyticsapp
+  static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: java_analytics
+        __path__: /tmp/logs/analytics.log

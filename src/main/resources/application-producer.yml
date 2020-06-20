@@ -1,0 +1,78 @@
+welcome:
+  url: "/ui/producer.html"
+---
+micronaut:
+  application:
+    name: producerapp
+    instance:
+      id: ${random.shortuuid}
+  server:
+    port: 8080
+
+  cors:
+    enabled: true
+
+  io:
+    watch:
+      paths: src/main
+      restart: true
+
+  router:
+    static-resources:
+      default:
+        enabled: true
+        mapping: "/ui/**"
+        paths: "classpath:public"
+
+  metrics:
+    enabled: true
+    export:
+      prometheus:
+        enabled: true
+        step: PT1M
+        descriptions: true
+        http:
+          url: http://dockerhost:9090
+---
+kafka:
+  bootstrap:
+    servers: dockerhost:9094
+
+---
+tracing:
+  zipkin:
+    enabled: true
+    traceId128Bit: true
+    http:
+      url: http://dockerhost:9411
+    sampler:
+      probability: 1
+
+---
+endpoints:
+  beans:
+    sensitive: false
+  info:
+    sensitive: false
+  loggers:
+    sensitive: false
+  metrics:
+    sensitive: false
+  prometheus:
+    sensitive: false
+
+---
+logger:
+  levels:
+    org.apache.kafka: ERROR
+
+---
+consul:
+  client:
+    registration:
+      enabled: true
+      tags:
+        - kafka-producer
+      retry-count: 5
+      fail-fast: false
+    defaultZone: "${CONSUL_HOST:dockerhost}:${CONSUL_PORT:8500}"

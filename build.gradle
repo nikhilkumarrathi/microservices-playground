@@ -1,0 +1,124 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "application"
+    id "net.ltgt.apt-eclipse" version "0.21"
+}
+
+version "1.0"
+group "micronautapp"
+
+repositories {
+    mavenCentral()
+    maven { url "https://jcenter.bintray.com" }
+}
+
+configurations {
+    // for dependencies that are needed for development only
+    developmentOnly 
+}
+
+dependencies {
+    annotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
+    annotationProcessor "io.micronaut:micronaut-inject-java"
+    annotationProcessor "io.micronaut:micronaut-validation"
+    implementation platform("io.micronaut:micronaut-bom:$micronautVersion")
+    implementation "io.micronaut:micronaut-management"
+    implementation "io.micronaut.configuration:micronaut-kafka:1.4.0"
+    implementation "io.micronaut.kafka:micronaut-kafka-streams:2.0.0"
+    implementation "io.opentracing.contrib:opentracing-kafka-client:0.1.13"
+    implementation "io.opentracing.brave:brave-opentracing"
+    implementation "io.micronaut:micronaut-tracing"
+    implementation "io.micronaut:micronaut-http-client"
+    implementation "io.micronaut:micronaut-inject"
+    implementation "io.micronaut:micronaut-validation"
+    implementation "io.micronaut:micronaut-runtime"
+//  Micrometer
+    implementation "io.micronaut.configuration:micronaut-micrometer-core"
+    implementation "io.micronaut.configuration:micronaut-micrometer-registry-prometheus"
+    implementation "io.micronaut:micronaut-http-server-netty"
+//    Discovery
+    implementation "io.micronaut:micronaut-discovery-client"
+//    Tracing
+    //Mongo DB
+    implementation "org.mongodb:mongodb-driver:3.4.3"
+    runtimeOnly "io.zipkin.brave:brave-instrumentation-http"
+    runtimeOnly "io.zipkin.reporter2:zipkin-reporter"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    testAnnotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
+    testAnnotationProcessor "io.micronaut:micronaut-inject-java"
+    testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
+    testImplementation "org.junit.jupiter:junit-jupiter-api"
+    testImplementation "io.micronaut.test:micronaut-test-junit5"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+    developmentOnly "io.micronaut:micronaut-runtime-osx:$micronautVersion"
+    developmentOnly "net.java.dev.jna:jna"
+    developmentOnly "io.methvin:directory-watcher:0.9.4"
+}
+
+test.classpath += configurations.developmentOnly
+
+mainClassName = "common.Application"
+// use JUnit 5 platform
+test {
+    useJUnitPlatform()
+}
+
+shadowJar {
+    mergeServiceFiles()
+}
+
+task copyui {
+    doFirst {
+        println "Copying UI artefacts to Resources"
+        copy {
+            from "ui/public/"
+            into "src/main/resources/public"
+        }
+        copy {
+            from "ui/dist"
+            into "src/main/resources/public/dist"
+        }
+    }
+}
+
+copyui.dependsOn([":ui:build"])
+
+shadowJar.dependsOn(["copyui"])
+
+
+def ordered(String... dependencyPaths) {
+    def dependencies = dependencyPaths.collect { tasks.getByPath(it) }
+    for (int i = 0; i < dependencies.size() - 1; i++) {
+        dependencies[i + 1].mustRunAfter(dependencies[i])
+    }
+    return dependencies
+}
+
+task all() {
+    dependsOn ordered(":ui:install", ":ui:build" ,"copyui", "shadowJar")
+}
+
+task reset(){
+    doFirst {
+        println "Deleting existing build files"
+        delete "build","out","/tmp/logs","src/main/resources/public"
+    }
+}
+
+task info(){
+    doFirst {
+        println("all : build all Java, UI files")
+        println("reset : delete are build artefacts")
+    }
+    dependsOn(":ui:info")
+}
+
+tasks.withType(JavaExec) {
+    classpath += configurations.developmentOnly
+    jvmArgs('-noverify', '-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote')
+}
+
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+    options.compilerArgs.add('-parameters')
+}

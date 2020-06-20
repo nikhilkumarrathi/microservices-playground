@@ -1,0 +1,25 @@
+.App {
+  margin: 1rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+body{
+  /* color:red; */
+}
+
+nav img {
+  max-height: 25px;
+  padding-right:5px;
+}
+
+.producerBox{
+    height:300px;
+    width: 300px;
+    background : cornflowerblue;
+}
+
+.off{
+  text-decoration: line-through;
+}
+.on{
+  color: green;
+}

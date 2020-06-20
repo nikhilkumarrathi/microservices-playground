@@ -1,0 +1,204 @@
+version: "2.1"
+
+services:
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    mem_limit: 300M
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=nimda
+      - MONGO_INITDB_DATABASE=admin
+    volumes:
+      - ./config/mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+    ports:
+      - "27017:27017"
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+    restart: on-failure
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    mem_limit: 800M
+    ports:
+      - "9411:9411"
+    depends_on:
+      - mongodb
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    mem_limit: 300M
+    ports:
+      - "9090:9090"
+    depends_on:
+      - zipkin
+    volumes:
+      - ./config/general/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./tmp/log/:/var/log/
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+
+  consul:
+    container_name: consul
+    image: consul:1.2.4
+    mem_limit: 300M
+    ports:
+      - "8500:8500"
+    depends_on:
+      - prometheus
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    mem_limit: 300M
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+      - promtail
+      - prometheus
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+
+  loki:
+    container_name: loki
+    image: grafana/loki:1.5.0
+    mem_limit: 100M
+    ports:
+      - "3100:3100"
+    command: -config.file=/mnt/config/loki-config.yml
+    volumes:
+      - ./config/general/:/mnt/config/
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:1.5.0
+    mem_limit: 200M
+    command: -config.file=/mnt/config/promtail-config.yml
+    depends_on:
+      - loki
+    volumes:
+      - /tmp/logs/:/tmp/logs/
+      - ./config/general/:/mnt/config/
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper
+    mem_limit: 300M
+    ports:
+      - "2181:2181"
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka
+    mem_limit: 800M
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://dockerhost:9094
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+
+  micronaut-producer:
+    container_name: micronaut-producer
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - "PORT=8080"
+    mem_limit: 500M
+    environment:
+      - MICRONAUT_ENVIRONMENTS=producer
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+      - mongodb
+      - zipkin
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+    volumes:
+      - /tmp/logs/:/tmp/logs/
+
+  micronaut-consumer:
+    container_name: micronaut-consumer
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - "PORT=8082"
+    mem_limit: 500M
+    environment:
+      - MICRONAUT_ENVIRONMENTS=consumer
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+      - mongodb
+      - zipkin
+      - micronaut-producer
+    ports:
+      - "8082:8082"
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+    volumes:
+      - /tmp/logs/:/tmp/logs/
+
+  micronaut-analytics:
+    container_name: micronaut-analytics
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - "PORT=8084"
+    mem_limit: 500M
+    environment:
+      - MICRONAUT_ENVIRONMENTS=analytics
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - consul
+      - micronaut-consumer
+    ports:
+      - "8084:8084"
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+    volumes:
+      - /tmp/logs/:/tmp/logs/
+
+  mongoexpress:
+    container_name: mongoexpress
+    image: mongo-express:latest
+    mem_limit: 200M
+    depends_on:
+      - consul
+    environment:
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=nimda
+      - ME_CONFIG_MONGODB_SERVER=dockerhost
+    ports:
+      - "8081:8081"
+    extra_hosts:
+      - "dockerhost:$DOCKERHOST"
+    restart: on-failure

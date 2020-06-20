@@ -1,0 +1,8 @@
+---
+micronaut:
+  application:
+    name: testapp
+    instance:
+      id: ${random.shortuuid}
+  cors:
+    enabled: true

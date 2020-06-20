@@ -1,0 +1,40 @@
+plugins {
+    id "com.moowork.node" version "1.3.1"
+}
+
+task install(type: NpmTask){
+    doFirst{
+        println "Installing all node dependencies"
+    }
+    args = ['install']
+}
+
+task build(type: NpmTask){
+    doFirst{
+        println "Building node project"
+    }
+    args = ['run','build']
+}
+
+task devServer(type: NpmTask){
+    doFirst{
+       println  "Serving Webpack built project from memory"
+    }
+    args = ['run','start']
+}
+
+task reset(){
+    doFirst {
+        println "Deleting existing UI build files"
+        delete "dist","node_modules"
+    }
+}
+
+task info(){
+    doFirst {
+        println("install : npm install")
+        println("build : webpack Production build")
+        println("reset : resaet all UI build")
+        println("devServer : run Dev Server")
+    }
+}
