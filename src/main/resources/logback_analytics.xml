@@ -27,4 +27,5 @@
     <logger name="io.netty.handler.logging" level="info">
         <appender-ref ref="STDOUT" />
     </logger>
+<!--    <logger name="io.micronaut.context.condition" level="DEBUG"/>-->
 </configuration>

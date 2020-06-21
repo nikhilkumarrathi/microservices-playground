@@ -1,80 +1,56 @@
 import * as React from 'react';
-import { Chart } from 'react-charts';
+import Chart from "react-apexcharts";
 
-interface ChartState { 
-  axes: any,
-  data: [],
-  keys: [string,boolean][],
-  viewData: {}
-}
-
-export class MyChart extends React.Component<{}, ChartState> {
+export class MyApexChart extends React.Component<{}, {}> {
   constructor(props) {
     super(props);
-    this.state = {
-      data: [],
-      viewData: {},
-      keys: [],
-      axes: [
-        { primary: true, type: 'time', position: 'bottom' },
-        { type: 'linear', position: 'left' }
-      ],
-    }
-    
+
     const getData = () => { 
       fetch("/analysis/views").then(response => response.json()).then(d => {
         console.log(d)
-        let keys = d.map(o => [o.label, true]);
-        let visibleKeys = keys.filter(keyItem => keyItem[1]).map(keyItem => keyItem[0])
-        let viewData = d.filter(o => visibleKeys.indexOf(o.label) != -1);
-        this.setState({ data: d, viewData : viewData , keys: keys});
+        this.setState({ series: d});
       });
     }
-    
+    this.state = {
+      series: [],
+      options: {
+        chart: {
+          height: 500,
+          type: 'line',
+          zoom: {
+            enabled: false
+          }
+        },
+        dataLabels: {
+          enabled: true
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        title: {
+          text: 'Products Viewed',
+          align: 'left'
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+            opacity: 0.5
+          },
+        },
+        xaxis: {
+          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+        }
+      },
+
+    };
+
     getData();
-    setInterval(() => getData(), 30000);
-
-    this.toggleKeys = this.toggleKeys.bind(this);
   }
-
-  toggleKeys(k: string){ 
-    let keys = this.state.keys.map(keyItem => { 
-      if (keyItem[0] == k) {
-        return [keyItem[0], !keyItem[1]];
-      }
-      return keyItem;
-    });
-
-   let visibleKeys = keys.filter(keyItem => keyItem[1]).map(keyItem => keyItem[0])
-   let viewData = this.state.data.filter(o => visibleKeys.indexOf(o.label) != -1);
-   this.setState({viewData : viewData , keys: keys})
-  }
-
-
-
-  render() { 
+  render() {
     return (
-      <>
-        <div className="row mt-5">
-          <div className="col-8">
-                <div
-              style={{
-                  width: '100%',
-                  height: '400px'
-              }}
-              >
-              <Chart data={this.state.viewData} axes={this.state.axes} />
-            </div>
-          </div>
-        <div className="col-4">
-          <ul className="list-group list-group-horizontal">
-            {
-              this.state.keys.map(k => (<li className="list-group-item"><span onClick={() => this.toggleKeys(k[0])} className={k[1]? 'on' : 'off'}>{k[0]}</span></li>))
-            }
-          </ul>
-          </div>
-          </div>
-      </>
-    )
+      <div id="chart">
+        <Chart options={this.state.options} series={this.state.series} type="line" height={500} />
+      </div>
+    );
   }
 }

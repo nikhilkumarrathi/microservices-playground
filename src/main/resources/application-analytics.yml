@@ -65,14 +65,14 @@ endpoints:
 ---
 logger:
   levels:
-
+    org.apache.kafka: WARN
 ---
 consul:
   client:
     registration:
       enabled: true
       tags:
-        - kafka-analytics
+        - analytics
       retry-count: 5
       fail-fast: false
     defaultZone: "${CONSUL_HOST:dockerhost}:${CONSUL_PORT:8500}"

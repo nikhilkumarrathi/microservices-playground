@@ -4,17 +4,20 @@ import { useState, useEffect } from "react";
 import products, { Product } from '../data/products';
 
 
-export class ProductComponent extends React.Component<{}, {}> {
+export class ProductComponent extends React.Component<{generateRandom: boolean}, {}> {
   
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);
     this.productCard = this.productCard.bind(this);
 
-    setInterval(() => {
-      let randomIndex = Math.floor(Math.random() * products.length);
-      this.handleClick(products[randomIndex]);
-    }, 5000);    
+    if (props.generateRandom) { 
+      setInterval(() => {
+        let randomIndex = Math.floor(Math.random() * products.length);
+        this.handleClick(products[randomIndex]);
+      }, 5000); 
+    }
+    
 
   }
 

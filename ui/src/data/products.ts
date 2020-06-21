@@ -8,22 +8,22 @@ const products: Product[] = [
   {
     id: 0,
     name: "Product 1",
-    url: "https://picsum.photos/200/250",
+    url: "images/products/product1.jpg",
   },
   {
     id: 1,
     name: "Product 2",
-    url: "https://picsum.photos/201/250",
+    url: "images/products/product2.jpg",
   },
   {
     id: 2,
     name: "Product 3",
-    url: "https://picsum.photos/200/251",
+    url: "images/products/product3.jpg",
   },
   {
     id: 3,
     name: "Product 4",
-    url: "https://picsum.photos/202/250",
+    url: "images/products/product4.jpg",
   },
 ];
 

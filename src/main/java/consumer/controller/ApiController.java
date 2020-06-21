@@ -38,7 +38,7 @@ public class ApiController {
     @Get(value = "/views")
     public Map<String,List<ProductViewCount>> greet(){
         LOG.info("serving Product Analysis Data");
-        int units = 15;
+        int units = 30;
         Date pastDate = new Date(new Date().getTime() - units*60L*1000L);
         var data = StreamSupport.stream(
                 mongoService.getProductCollection().find(Filters.gt("time",pastDate)).spliterator()

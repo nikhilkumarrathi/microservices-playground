@@ -26,11 +26,13 @@ public class ChartController {
     public List<Map<String,Object>> getViewData(){
         LOG.info("fetching data from API Server");
         var data = apiClient.getViews();
-        return data.entrySet().stream()
+        var retData =  data.entrySet().stream()
                 .map(e -> Map.of(
-                        "label", e.getKey(), "data",
+                        "name", e.getKey(),
+                        "data",
                         e.getValue().stream().map(v -> new Object[]{v.getTime(),v.getViews()}).collect(Collectors.toList())))
                 .collect(Collectors.toList());
+        return retData;
     }
 
 }
