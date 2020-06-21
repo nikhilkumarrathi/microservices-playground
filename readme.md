@@ -51,6 +51,8 @@ sudo vim /ets/hosts
 ```
 
 **Build Micronaut Package**
+[![Build Status](https://travis-ci.org/nikhilkumarrathi/microservices-playground.svg?branch=master)](https://travis-ci.org/nikhilkumarrathi/microservices-playground)
+
 ```sh
 ./gradlew all
 ```
