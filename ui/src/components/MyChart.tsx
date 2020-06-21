@@ -25,7 +25,7 @@ export class MyApexChart extends React.Component<{}, {}> {
           enabled: true
         },
         stroke: {
-          curve: 'straight'
+          curve: 'smooth'
         },
         title: {
           text: 'Products Viewed',
