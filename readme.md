@@ -19,7 +19,7 @@ This repository provides a set of Docker containers and Java Microservices to ge
   - [Micronaut Apps](#micronaut-apps)
     - [Producer app](#producer-app)
     - [Consumer app](#consumer-app)
-    - [Analytics app](#analytics-app)
+    - [Analytics ap](#analytics-ap)
   - [Apache Kafka, Zookeeper](#apache-kafka-zookeeper)
   - [Consul](#consul)
   - [Zipkin](#zipkin)
@@ -37,11 +37,11 @@ This repository provides a set of Docker containers and Java Microservices to ge
 ![Architecture](images/dritributed-architecture.png)
 
 # Technical Stack
-**Microservice Framework:** Micronaut , JDK
-**UI:** React, Typescript    
-**Build Tools:** Gradle, Webpack
-**Container:** Docker  , Docker Compose
-**Stream Processing**: Apache Kafka
+- **Microservice Framework:** Micronaut , JDK
+- **UI:** React, Typescript
+- **Build Tools:** Gradle, Webpack
+- **Container:** Docker  , Docker Compose
+- **Stream Processing**: Apache Kafka
 
 # Quick Setup
 **Setup host file**
@@ -102,7 +102,7 @@ This app:
 - Provide a UI App which allows generating those events from a browser
 
 Browse at: http://localhost:8082
-![Producer App](images/app-producer.png)
+<img src="images/app-producer.png"  width="300"/><br/>
 
 ### Consumer app
 This app: 
@@ -110,14 +110,14 @@ This app:
 - Has a Kafka Consumer to read the Aggregated Product Views Data and write them to MongoDB Database 
 - Exposes an Endpoint which provides Analytical Data with a Generic structure
 
-### Analytics app
+### Analytics ap
 This app:
 - Has a Consumer App using Service Discovery
 - Fetches the Data from Consumer's Endpoint and convert into an Acceptable format by UI app
 - Provide a UI app to view the Product View Analytical chart
 
 Browse at: http://localhost:8084
-![Producer App](images/app-analytics.png)
+<img src="images/app-analytics.png"  width="300"/><br/>
 
 ## Apache Kafka, Zookeeper
 Apache Kafka is used as a backend for supporting Micronaut apps for Distributed Stream processing.
@@ -127,19 +127,16 @@ Apache Kafka relies on Zookeeper which runs as a standalone appliaction.
 Consul provides Service Discovery feature among many others. All Micronaut apps register with Consul at start-up.
 Micronaut Analytics app uses Service Discovery Client to find the address of the Consumer and then invoke it's Endpoint to fetch the data.
 
-![Consul](images/consul.png)
+<img src="images/consul.png"  width="300"/><br/>
 
 ## Zipkin
 All Micronaut Apps are configured with Zipkin. OOTB Zipkin is integrated with Client and Server side Http Requests, and also with Kafka Streams.
 The TraceIDs of the Spans is present in the log file which is used to jump to the related trace.
 
-![alt](images/zipkin-producer-search.png)
-
-![alt](images/zipkin-producer-detailed.png)
-
-![alt](images/zipkin-analytics-search.png)
-
-![alt](images/zipkin-analytics-detailed.png)
+<img src="images/zipkin-producer-search.png"  width="300"/><br/>
+<img src="images/zipkin-producer-detailed.png" width="300"/><br/>
+<img src="images/zipkin-analytics-search.png" width="300"/><br/>
+<img src="images/zipkin-analytics-detailed.png" width="300"/><br/>
 
 
 ## Grafana
@@ -147,10 +144,11 @@ Grafana is an analytics and monitoring solution. In this system Grafana relies o
 Prometheus provides the required metrics from the Micronaut apps, and Loki provides the application Logs to it.
 
 Sample Dashboard:
-![alt](images/grafana-dashboard.png)
+<img src="images/grafana-dashboard.png" width="300"/><br/>
+
 
 Can jump to trace directly from Grafana:
-![alt](images/grafana-trace.png)
+<img src="images/grafana-trace.png" width="300"/><br/>
 
 *Use `admin` as User ID and Password while logging into Grafana.*
 
@@ -159,7 +157,7 @@ Can jump to trace directly from Grafana:
 Prometheus is a System monitoring tool which collects metrics from Applications and acts as a source to Grafana.
 Prometheus uses the Micronaut App endpoints to get the metrics of the apps relating to its Infrastructure and functionality.
 
-![Prometheus Chart](images/prometheus.png)
+<img src="images/prometheus.png" width="300"/><br/>
 
 ## Loki, Promtail
 Loki is a grafana supported Log aggregation system. Loki relies on the Promtail agents which has access to all Application logs using shared file Systems.
