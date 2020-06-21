@@ -81,11 +81,6 @@ task copyui {
     }
 }
 
-copyui.dependsOn([":ui:build"])
-
-shadowJar.dependsOn(["copyui"])
-
-
 def ordered(String... dependencyPaths) {
     def dependencies = dependencyPaths.collect { tasks.getByPath(it) }
     for (int i = 0; i < dependencies.size() - 1; i++) {
