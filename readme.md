@@ -101,7 +101,8 @@ This app:
 - Exposes an Endpoint which receives the Product View feeds
 - Provide a UI App which allows generating those events from a browser
 
-Browse at: http://localhost:8082
+Browse at: http://localhost:8082  
+
 <img src="images/app-producer.png"  width="300"/><br/>
 
 ### Consumer app
@@ -116,7 +117,8 @@ This app:
 - Fetches the Data from Consumer's Endpoint and convert into an Acceptable format by UI app
 - Provide a UI app to view the Product View Analytical chart
 
-Browse at: http://localhost:8084
+Browse at: http://localhost:8084  
+
 <img src="images/app-analytics.png"  width="300"/><br/>
 
 ## Apache Kafka, Zookeeper
@@ -133,21 +135,21 @@ Micronaut Analytics app uses Service Discovery Client to find the address of the
 All Micronaut Apps are configured with Zipkin. OOTB Zipkin is integrated with Client and Server side Http Requests, and also with Kafka Streams.
 The TraceIDs of the Spans is present in the log file which is used to jump to the related trace.
 
-<img src="images/zipkin-producer-search.png"  width="300"/><br/>
-<img src="images/zipkin-producer-detailed.png" width="300"/><br/>
-<img src="images/zipkin-analytics-search.png" width="300"/><br/>
-<img src="images/zipkin-analytics-detailed.png" width="300"/><br/>
+<img src="images/zipkin-producer-search.png"  width="300"/> <img src="images/zipkin-producer-detailed.png" width="300"/><br/>
+<img src="images/zipkin-analytics-search.png" width="300"/> <img src="images/zipkin-analytics-detailed.png" width="300"/><br/>
 
 
 ## Grafana
 Grafana is an analytics and monitoring solution. In this system Grafana relies on the Prometheus and Loki as datasource. 
 Prometheus provides the required metrics from the Micronaut apps, and Loki provides the application Logs to it.
 
-Sample Dashboard:
+Sample Dashboard: 
+
 <img src="images/grafana-dashboard.png" width="300"/><br/>
 
 
-Can jump to trace directly from Grafana:
+Can jump to trace directly from Grafana: 
+
 <img src="images/grafana-trace.png" width="300"/><br/>
 
 *Use `admin` as User ID and Password while logging into Grafana.*
